@@ -1,0 +1,47 @@
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: learn-fastapi
+    ports:
+      - "8000:8000"
+    environment:
+      - RABBITMQ_URL=amqp://akin_admin:akin_local_pass@rabbitmq:5672/
+      - CELERY_BROKER_URL=amqp://akin_admin:akin_local_pass@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=rpc://
+    volumes:
+      - .:/app
+    working_dir: /app/src
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - akin-network
+
+  # celery-worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: learn-celery-worker
+  #   environment:
+  #     - RABBITMQ_URL=amqp://akin_admin:akin_local_pass@rabbitmq:5672/
+  #     - CELERY_BROKER_URL=amqp://akin_admin:akin_local_pass@rabbitmq:5672/
+  #     - CELERY_RESULT_BACKEND=rpc://
+  #   volumes:
+  #     - .:/app
+  #   working_dir: /app/src
+  #   command: celery -A app.celery:app worker --loglevel=info
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   networks:
+  #     - akin-network
+
+volumes:
+  rabbitmq-data:
+
+networks:
+  akin-network:
+    driver: bridge

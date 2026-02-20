@@ -1,0 +1,44 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: akin-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data-akin:/data
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - akin-network
+  
+  fastapi:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    container_name: akin-fastapi
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - akin-network
+
+
+volumes:
+  redis_data-akin:
+    driver: local
+
+networks:
+  akin-network:
+    driver: bridge

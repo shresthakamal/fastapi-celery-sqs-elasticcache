@@ -1,0 +1,20 @@
+services:
+  celery-worker:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    container_name: akin-celery-worker
+    env_file:
+      - .env.worker
+    volumes:
+      - .:/app
+    working_dir: /app/src
+    command: sh /app/scripts/worker/start-worker.sh
+    restart: unless-stopped
+    networks:
+      - akin-network
+
+networks:
+  akin-network:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-akin}_akin-network
