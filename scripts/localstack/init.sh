@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# LocalStack initialization script for AI4U Backend
 # This script runs when LocalStack is ready and creates required AWS resources.
 
 echo "======================================"

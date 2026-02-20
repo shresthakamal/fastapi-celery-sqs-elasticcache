@@ -37,11 +37,10 @@ class Settings(BaseSettings):
     # AWS Configuration
     AWS_REGION: str = "us-east-1"
     AWS_ACCESS_KEY_ID: str = "test"
-    AWS_ENDPOINT_URL: str = "http://localhost:4566"
+    AWS_ENDPOINT_URL: str = ""
     AWS_SECRET_ACCESS_KEY: str = "test"
 
     SQS_QUEUE_NAME: str = ""
-    SQS_QUEUE_URL: str = ""
 
     CELERY_RESULT_BACKEND: str = ""
 

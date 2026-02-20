@@ -1,14 +1,8 @@
 from celery import Celery
-from kombu.utils.url import safequote
 from config import settings
 
 
-aws_access_key = safequote(settings.AWS_ACCESS_KEY_ID)
-aws_secret_key = safequote(settings.AWS_SECRET_ACCESS_KEY)
-
-broker_url = "sqs://{aws_access_key}:{aws_secret_key}@".format(
-    aws_access_key=aws_access_key, aws_secret_key=aws_secret_key,
-)
+broker_url = "sqs://"
 
 result_backend = settings.CELERY_RESULT_BACKEND
 
@@ -21,19 +15,10 @@ app = Celery(
 )
 
 transport_options = {
-    "region": settings.AWS_REGION,
     "visibility_timeout": 3600,
-    "predefined_queues": {
-        settings.SQS_QUEUE_NAME: {
-            "url": settings.SQS_QUEUE_URL,
-            "access_key_id": settings.AWS_ACCESS_KEY_ID,
-            "secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
-        }
-    },
+    "region": settings.AWS_REGION or "us-east-1",
+    "queue_name_prefix": settings.SQS_QUEUE_NAME
 }
-
-if settings.AWS_ENDPOINT_URL:
-    transport_options["endpoint_url"] = settings.AWS_ENDPOINT_URL
 
 app.conf.broker_transport_options = transport_options
 
